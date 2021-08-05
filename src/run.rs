@@ -2,18 +2,24 @@ use std::io::Write;
 use std::process::{Command, Stdio};
 use std::str;
 
-use crate::config::Config;
+use crate::config::{Config, Task};
 use crate::discover;
 use crate::executor::execute;
 use crate::fzf::Formatter;
 use crate::logging::*;
 use crate::model::Action;
+use crate::preview::preview;
 
 pub fn run(config: Config) {
-    let actions = discover::global_actions();
-    match choose_action(&actions) {
-        Some(path) => execute(&path),
-        _ => info!("nothing selected"),
+    match config.task {
+        Task::List => {
+            let actions = discover::global_actions();
+            match choose_action(&actions) {
+                Some(path) => execute(&path),
+                _ => info!("nothing selected"),
+            }
+        }
+        Task::Preview(path) => preview(&path),
     }
 }
 
@@ -32,11 +38,16 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
         .arg("--header")
         .arg("") // sepratate line
         .arg("--prompt=▶ ")
-        .arg("--pointer=▶");
+        .arg("--pointer=▶")
+        .arg("--color=bg:-1,bg+:-1") // transparent background
+        // .arg("--border=none")
+        .arg("--preview")
+        .arg("ap preview {1}")
+        .arg("--preview-window")
+        // .arg("right,60%,wrap,border-none");
+        .arg("right,60%,wrap");
 
     let mut child = cmd_ref
-        .arg("--color=bg:-1,bg+:-1") // transparent background
-        .arg("--border=none")
         // pipe
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())

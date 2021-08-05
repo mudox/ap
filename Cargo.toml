@@ -1,7 +1,11 @@
 [package]
-name = "ap"
-version = "0.1.0"
 edition = "2018"
+
+name = "ap"
+author = "mudox <imudox@gmail.com>"
+version = "0.1.0"
+about = "Action palette"
+description = "Action palette"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -11,7 +15,7 @@ clap = "2.33.3"
 
 # file system
 dirs = "3.0.2"
-glob = "0.3.0"
+is_executable = "1.0.1"
 
 # log
 log = "0.4.14"
@@ -23,8 +27,8 @@ toml = "0.5.8"
 
 # ui
 termion = "1.5.6"
-is_executable = "1.0.1"
 term-kit =  { path = "../term-kit" }
+time = { version = "0.3.0", features = ["formatting"] }
 
 [dev-dependencies]
 pretty_assertions = "0.7.2"

@@ -6,3 +6,4 @@ mod discover;
 mod executor;
 mod fzf;
 mod model;
+mod preview;
