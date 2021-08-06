@@ -1,6 +1,5 @@
 use std::error::Error;
-use std::fs::{self, OpenOptions};
-use std::io::Write;
+use std::fs;
 use std::process::Command;
 use std::str;
 
@@ -77,7 +76,7 @@ fn bat(path: &str) -> Result<String, Box<dyn Error>> {
     let mut cmd = Command::new("bat");
     let cmd_mut_ref = cmd
         .arg("--color=always")
-        .arg("--style=grid,numbers,rule,snip,changes")
+        .arg("--style=grid")
         .arg("--wrap=never");
 
     if let Ok(width) = std::env::var("FZF_PREVIEW_COLUMNS") {
