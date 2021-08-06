@@ -11,7 +11,7 @@ description = "Action palette"
 
 [dependencies]
 # cli
-clap = "2.33.3"
+clap = "3.0.0-beta.2"
 
 # file system
 dirs = "3.0.2"

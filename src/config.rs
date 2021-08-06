@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use clap::{crate_authors, crate_description, crate_name, crate_version, App, Arg, SubCommand};
+use clap::{app_from_crate, App, Arg};
 
 /// Return config dir.
 pub fn dir() -> PathBuf {
@@ -29,21 +29,21 @@ pub struct Config {
 
 impl Config {
     pub fn load() -> Config {
-        let matches = App::new(crate_name!())
-            .author(crate_authors!())
-            .version(crate_version!())
-            .about(crate_description!())
-            .subcommand(
-                SubCommand::with_name("preview")
-                    .alias("p")
-                    .about("Generate fzf preview content for ACTION_PATH")
-                    .arg(
-                        Arg::with_name("ACTION_PATH")
-                            .help("The path of the action file to generate preview")
-                            .required(true)
-                            .index(1),
-                    ),
-            )
+        let preview_cmd = App::new("preview")
+            .alias("p")
+            .about("Generate fzf preview content for ACTION_PATH")
+            .arg(
+                Arg::new("ACTION_PATH")
+                    .about("The path of the action file to generate preview")
+                    .required(true)
+                    .index(1),
+            );
+
+        let matches = app_from_crate!() // let matches = App::new(crate_name!())
+            // .author(crate_authors!())
+            // .version(crate_version!())
+            // .about(crate_description!())
+            .subcommand(preview_cmd)
             .get_matches();
 
         let task = if let Some(matches) = matches.subcommand_matches("preview") {
