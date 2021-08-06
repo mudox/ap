@@ -10,7 +10,7 @@ pub use std::{
 
 pub fn init() {
     if cfg!(not(debug_assertions)) {
-        std::env::set_var("RUST_LOG", "warn");
+        std::env::set_var("RUST_LOG", "error");
     } else {
         std::env::set_var("RUST_LOG", "trace");
     }
