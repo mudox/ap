@@ -1,5 +1,6 @@
 use std::error::Error;
-use std::fs;
+use std::fs::{self, OpenOptions};
+use std::io::Write;
 use std::process::Command;
 use std::str;
 
@@ -36,9 +37,8 @@ pub fn preview(path: &str) {
         println!("{}", line("Description", &desc));
     }
 
-    // bat filter
     if let Ok(bat) = bat(path) {
-        println!("{}", &bat);
+        println!("{}", &bat)
     }
 }
 
@@ -74,12 +74,18 @@ fn ctime(path: &str) -> Result<String, Box<dyn Error>> {
 }
 
 fn bat(path: &str) -> Result<String, Box<dyn Error>> {
-    let output = Command::new("bat")
+    let mut cmd = Command::new("bat");
+    let cmd_mut_ref = cmd
         .arg("--color=always")
         .arg("--style=grid,numbers,rule,snip,changes")
-        .arg("--terminal-width=114")
-        .arg("--wrap=never")
-        .arg(path)
-        .output();
+        .arg("--wrap=never");
+
+    if let Ok(width) = std::env::var("FZF_PREVIEW_COLUMNS") {
+        let mut width: usize = width.parse().unwrap();
+        width -= 2;
+        cmd_mut_ref.arg("--terminal-width").arg(width.to_string());
+    }
+
+    let output = cmd_mut_ref.arg(path).output();
     Ok(String::from_utf8(output?.stdout)?)
 }
