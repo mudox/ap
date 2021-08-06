@@ -28,26 +28,39 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
     let feed = fzf.feed().join("\n");
 
     let mut cmd = Command::new("fzf");
-    let cmd_ref = cmd
+    let cmd_mut_ref = cmd
+        .env("FZF_DEFAULT_OPTS", "")
+        // search
         .arg("--with-nth=2..")
         .arg("--no-sort")
         .arg("--tiebreak=end")
+        // ui
+        .arg("--layout=reverse")
+        .arg("--height=60%")
+        .arg("--min-height=30")
         .arg("--ansi")
-        .arg("--margin=2")
+        .arg("--margin=1")
+        .arg("--padding=1")
         .arg("--inline-info")
         .arg("--header")
         .arg("") // sepratate line
         .arg("--prompt=▶ ")
         .arg("--pointer=▶")
         .arg("--color=bg:-1,bg+:-1") // transparent background
-        // .arg("--border=none")
         .arg("--preview")
         .arg("ap preview {1}")
-        .arg("--preview-window")
-        // .arg("right,60%,wrap,border-none");
-        .arg("right,60%,wrap");
+        .arg("--preview-window");
 
-    let mut child = cmd_ref
+    if let Ok((w, _)) = termion::terminal_size() {
+        // 💀 magic number */
+        if w < 170 {
+            cmd_mut_ref.arg("down,70%,nowrap");
+        } else {
+            cmd_mut_ref.arg("right,60%,nowrap");
+        }
+    }
+
+    let mut child = cmd_mut_ref
         // pipe
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
