@@ -3,8 +3,8 @@ use std::fs;
 use std::process::Command;
 use std::str;
 
-use term_kit::*;
 use termion::color;
+use termkit::ui::*;
 use time::{format_description, OffsetDateTime};
 
 use crate::logging::*;

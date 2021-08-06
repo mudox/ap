@@ -1,5 +1,5 @@
-use term_kit as term;
 use termion::color;
+use termkit::ui::*;
 
 use crate::model::Action;
 
@@ -23,12 +23,12 @@ impl<'a> Formatter<'a> {
 impl<'a> Formatter<'a> {
     fn icon(&self, action: &Action) -> String {
         let icon = action.icon.clone().unwrap_or("·".to_string());
-        term::span(&icon, color::Yellow, 3, term::Alignment::Left)
+        lspan(&icon, color::Yellow, 3)
     }
 
     fn title(&self, action: &Action) -> String {
         let title = &action.title;
-        term::span(title, color::White, 3, term::Alignment::Left)
+        lspan(title, color::White, 3)
     }
 
     fn line(&self, action: &Action) -> String {
@@ -42,11 +42,5 @@ impl<'a> Formatter<'a> {
             icon = icon,
             title = title
         )
-    }
-}
-
-impl<'a> Formatter<'a> {
-    pub fn preview(&self, action: &Action) -> String {
-        unimplemented!()
     }
 }

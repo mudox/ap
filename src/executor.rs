@@ -1,7 +1,7 @@
 use std::process::Command;
 
-use term_kit::fg;
 use termion::color;
+use termkit::ui::fg;
 
 use crate::logging::*;
 
