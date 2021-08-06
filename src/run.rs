@@ -13,7 +13,7 @@ use crate::preview::preview;
 pub fn run(config: Config) {
     match config.task {
         Task::List => {
-            let actions = discover::global_actions();
+            let actions = discover::actions();
             match choose_action(&actions) {
                 Some(path) => execute(&path),
                 _ => info!("nothing selected"),

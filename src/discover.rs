@@ -8,10 +8,10 @@ use crate::config::{self};
 use crate::model::Action;
 
 /// Lookup actions from `.ap-actions` directory under the argument `path`.
-pub fn actions<P: AsRef<Path>>(path: P) -> Vec<Action> {
+fn actions_from<P: AsRef<Path>>(path: P) -> Vec<Action> {
     let entries = fs::read_dir(&path);
     if let Err(error) = entries {
-        warn!(
+        info!(
             "failed at `read_dir`:\n  path: {:?}\n  error: {:#?}",
             path.as_ref(),
             error,
@@ -38,17 +38,29 @@ pub fn actions<P: AsRef<Path>>(path: P) -> Vec<Action> {
         .collect()
 }
 
-pub fn global_actions() -> Vec<Action> {
+fn global_actions() -> Vec<Action> {
     let path = config::global_actions_dir();
-    actions(&path)
+    actions_from(&path)
 }
 
-pub fn local_actions<P: AsRef<Path>>(path: &P) -> Vec<Action> {
+fn local_actions<P: AsRef<Path>>(path: &P) -> Vec<Action> {
     path.as_ref()
         .ancestors()
-        .map(|path| actions(path.join(".ap-actions")))
+        .map(|path| actions_from(path.join(".ap-actions")))
         .flatten()
         .collect()
+}
+
+pub fn actions() -> Vec<Action> {
+    let mut actions = Vec::new();
+
+    if let Ok(path) = std::env::current_dir() {
+        actions.extend(local_actions(&path));
+    }
+
+    actions.extend(global_actions());
+
+    actions
 }
 
 #[cfg(test)]
