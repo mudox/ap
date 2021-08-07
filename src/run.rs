@@ -71,7 +71,11 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
         .arg("--bind")
         .arg("ctrl-f:page-down")
         .arg("--bind")
-        .arg("ctrl-b:page-up");
+        .arg("ctrl-b:page-up")
+        .arg("--bind")
+        .arg("ctrl-alt-f:preview-page-down")
+        .arg("--bind")
+        .arg("ctrl-alt-b:preview-page-up");
 
     cmd_mut_ref = cmd_mut_ref.arg("--expect=ctrl-e,ctrl-i");
 
