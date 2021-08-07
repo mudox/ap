@@ -4,7 +4,7 @@ use std::str;
 
 use crate::config::{Config, Task};
 use crate::discover;
-use crate::executor::execute;
+use crate::executor;
 use crate::fzf::Formatter;
 use crate::logging::*;
 use crate::model::Action;
@@ -15,7 +15,7 @@ pub fn run(config: Config) {
         Task::List => {
             let actions = discover::actions();
             match choose_action(&actions) {
-                Some(path) => execute(&path),
+                Some(lines) => executor::handle(&lines),
                 _ => info!("nothing selected"),
             }
         }
@@ -28,13 +28,16 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
     let feed = fzf.feed().join("\n");
 
     let mut cmd = Command::new("fzf");
-    let cmd_mut_ref = cmd
-        .env("FZF_DEFAULT_OPTS", "")
-        // search
+    let mut cmd_mut_ref = cmd.env("FZF_DEFAULT_OPTS", "");
+
+    // search
+    cmd_mut_ref = cmd_mut_ref
         .arg("--with-nth=2..")
         .arg("--no-sort")
-        .arg("--tiebreak=end")
-        // ui
+        .arg("--tiebreak=end");
+
+    // appearance
+    cmd_mut_ref = cmd_mut_ref
         .arg("--layout=reverse")
         .arg("--height=60%")
         .arg("--min-height=30")
@@ -43,10 +46,13 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
         .arg("--padding=1")
         .arg("--inline-info")
         .arg("--header")
-        .arg("") // sepratate line
+        .arg("Ctrl-e: edit, Ctrl-i: edit info") // sepratate line
         .arg("--prompt=▶ ")
         .arg("--pointer=▶")
-        .arg("--color=bg:-1,bg+:-1") // transparent background
+        .arg("--color=bg:-1,bg+:-1"); // transparent background
+
+    // preview
+    cmd_mut_ref = cmd_mut_ref
         .arg("--preview")
         .arg("ap preview {1}")
         .arg("--preview-window");
@@ -59,6 +65,15 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
             cmd_mut_ref.arg("right,60%,nowrap");
         }
     }
+
+    // key bindings
+    cmd_mut_ref = cmd_mut_ref
+        .arg("--bind")
+        .arg("ctrl-f:page-down")
+        .arg("--bind")
+        .arg("ctrl-b:page-up");
+
+    cmd_mut_ref = cmd_mut_ref.arg("--expect=ctrl-e,ctrl-i");
 
     let mut child = cmd_mut_ref
         // pipe
@@ -80,12 +95,15 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
         .expect("failed to wait `fzf` to exit");
     let output = str::from_utf8(output.stdout.as_slice()).unwrap();
 
-    let path = output.split("\t").take(1).collect::<String>();
-    debug!("chosen path: {:?}", path);
+    // would get 2 lines if fzf not cancelled by user:
+    //   1 - the key pressed to end fzf, empty for `enter`
+    //   2 - the path of the chosen action
+    let lines = output.split("\t").take(1).collect::<String>();
+    debug!("chosen: {:?}", lines);
 
-    if path.is_empty() {
+    if lines.is_empty() {
         None
     } else {
-        Some(path)
+        Some(lines)
     }
 }

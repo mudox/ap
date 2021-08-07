@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::process::Command;
 
 use termion::color;
@@ -5,7 +6,22 @@ use termkit::ui::fg;
 
 use crate::logging::*;
 
-pub fn execute(path: &str) {
+pub fn handle(path: &str) {
+    let mut lines = path.split("\n");
+    let key = lines.next().unwrap().trim();
+    let path = lines.next().unwrap();
+
+    debug!("pressed key: {:#?}", key);
+
+    match key {
+        "ctrl-e" => edit(path),
+        "ctrl-i" => edit(Path::new(path).with_extension("toml")),
+        "" => run(path),
+        _ => error!("unhandled result key: {:?}", key),
+    }
+}
+
+fn run(path: &str) {
     let tip = format!("executing `{}` ...", path);
     let tip = fg(color::Green, &tip);
     println!("{}", tip);
@@ -19,4 +35,16 @@ pub fn execute(path: &str) {
     };
 
     child.unwrap().wait().unwrap();
+}
+
+fn edit<P: AsRef<Path>>(path: P) {
+    Command::new("nvim")
+        .arg(path.as_ref())
+        .spawn()
+        .unwrap()
+        .wait()
+        .unwrap();
+
+    // should `exec` it
+    Command::new("ap").spawn().unwrap().wait().unwrap();
 }
