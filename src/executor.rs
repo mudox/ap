@@ -38,8 +38,12 @@ fn run(path: &str) {
 }
 
 fn edit<P: AsRef<Path>>(path: P) {
+    let meta_path = path.as_ref().with_extension("toml");
+
     Command::new("nvim")
+        .arg("-O")
         .arg(path.as_ref())
+        .arg(meta_path)
         .spawn()
         .unwrap()
         .wait()

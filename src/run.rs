@@ -46,7 +46,7 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
         .arg("--padding=1")
         .arg("--inline-info")
         .arg("--header")
-        .arg("Ctrl-e: edit, Ctrl-i: edit info") // sepratate line
+        .arg("Ctrl-e: edit") // sepratate line
         .arg("--prompt=▶ ")
         .arg("--pointer=▶")
         .arg("--color=bg:-1,bg+:-1"); // transparent background
