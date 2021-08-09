@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use clap::{app_from_crate, App, Arg};
+use clap::{app_from_crate, App, AppSettings, Arg};
 
 /// Return config dir.
 pub fn dir() -> PathBuf {
@@ -19,7 +19,8 @@ pub fn global_actions_dir() -> PathBuf {
 }
 
 pub enum Task {
-    List,
+    New { name: String, global: bool },
+    Execute,
     Preview(String),
 }
 
@@ -29,28 +30,47 @@ pub struct Config {
 
 impl Config {
     pub fn load() -> Config {
-        let preview_cmd = App::new("preview")
-            .alias("p")
+        let new = App::new("new")
+            .visible_aliases(&["a", "n"])
+            .about("Create new action")
+            .arg(
+                Arg::new("global")
+                    .short('g')
+                    .long("global")
+                    .about("Create a global action"),
+            )
+            .arg(
+                Arg::new("ACTION_NAME")
+                    .about("The filename of the action")
+                    .required(true)
+                    .index(1),
+            );
+
+        let preview = App::new("preview")
+            .visible_alias("p")
             .about("Generate fzf preview content for ACTION_PATH")
             .arg(
                 Arg::new("ACTION_PATH")
                     .about("The path of the action file to generate preview")
                     .required(true)
                     .index(1),
-            );
+            )
+            .setting(AppSettings::Hidden);
 
-        let matches = app_from_crate!() // let matches = App::new(crate_name!())
-            // .author(crate_authors!())
-            // .version(crate_version!())
-            // .about(crate_description!())
-            .subcommand(preview_cmd)
+        let matches = app_from_crate!()
+            .subcommand(new)
+            .subcommand(preview)
             .get_matches();
 
         let task = if let Some(matches) = matches.subcommand_matches("preview") {
             let path = matches.value_of("ACTION_PATH").unwrap().to_string();
             Task::Preview(path)
+        } else if let Some(matches) = matches.subcommand_matches("new") {
+            let name = matches.value_of("ACTION_NAME").unwrap().to_string();
+            let global = matches.is_present("global");
+            Task::New { name, global }
         } else {
-            Task::List
+            Task::Execute
         };
 
         Config { task }

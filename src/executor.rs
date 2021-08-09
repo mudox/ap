@@ -37,7 +37,7 @@ fn run(path: &str) {
     child.unwrap().wait().unwrap();
 }
 
-fn edit<P: AsRef<Path>>(path: P) {
+pub fn edit<P: AsRef<Path>>(path: P) {
     let meta_path = path.as_ref().with_extension("toml");
 
     Command::new("nvim")

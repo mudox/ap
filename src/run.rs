@@ -1,8 +1,11 @@
-use std::io::Write;
+use std::fs::{self, OpenOptions};
+use std::io::{ErrorKind, Write};
+use std::os::unix::fs::OpenOptionsExt;
+use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str;
 
-use crate::config::{Config, Task};
+use crate::config::{global_actions_dir, Config, Task};
 use crate::discover;
 use crate::executor;
 use crate::fzf::Formatter;
@@ -12,13 +15,14 @@ use crate::preview::preview;
 
 pub fn run(config: Config) {
     match config.task {
-        Task::List => {
+        Task::Execute => {
             let actions = discover::actions();
             match choose_action(&actions) {
                 Some(lines) => executor::handle(&lines),
                 _ => info!("nothing selected"),
             }
         }
+        Task::New { name, global } => create_action(&name, global),
         Task::Preview(path) => preview(&path),
     }
 }
@@ -110,4 +114,71 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
     } else {
         Some(lines)
     }
+}
+
+const SCRIPT_TEMPLATE: &str = "\
+#!/usr/bin/env zsh
+
+echo 'Hello world!'
+";
+
+const META_TEMPLATE: &str = "\
+# icon = \"+\"
+
+# required
+title = \"Hello world\"
+
+# description = \"\"
+";
+
+fn create_action(name: &str, global: bool) {
+    // determine path
+    let dir = if global {
+        global_actions_dir()
+    } else {
+        choose_local_action_dir()
+    };
+
+    // create `.ap-actions` dir if not exists
+    if let Err(error) = fs::create_dir(&dir) {
+        if error.kind() != ErrorKind::AlreadyExists {
+            error!(
+                "failed to create directory:\npath  {:?}\n  error: {:#?}",
+                dir, error
+            );
+            return;
+        }
+    }
+
+    // populate script file if not exists
+    let path = dir.join(name);
+    if !path.exists() {
+        OpenOptions::new()
+            .create(true)
+            .write(true)
+            .mode(0o731)
+            .open(&path)
+            .unwrap()
+            .write_all(SCRIPT_TEMPLATE.as_bytes())
+            .unwrap();
+    }
+
+    // populate meta file if not exists
+    let meta_path = path.with_extension("toml");
+    if !meta_path.exists() {
+        OpenOptions::new()
+            .create(true)
+            .write(true)
+            .open(&meta_path)
+            .unwrap()
+            .write_all(META_TEMPLATE.as_bytes())
+            .unwrap();
+    }
+
+    // open in editor
+    crate::executor::edit(&path);
+}
+
+fn choose_local_action_dir() -> PathBuf {
+    std::env::current_dir().unwrap().join(".ap-actions")
 }
