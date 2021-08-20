@@ -5,7 +5,14 @@ use std::path::PathBuf;
 use is_executable::is_executable;
 use serde::Deserialize;
 
+use crate::config;
 use crate::logging::*;
+
+pub enum ActionLocation {
+    Global,
+    CurrentDirectory,
+    AncestorDirectory,
+}
 
 #[derive(Default, Debug, Deserialize, PartialEq)]
 pub struct Action {
@@ -59,6 +66,18 @@ impl Action {
 
         info!("found action: {:?}", action.path);
         Some(action)
+    }
+
+    pub fn location(&self) -> ActionLocation {
+        let path = self.path.parent().unwrap();
+
+        if path == config::global_actions_dir().as_path() {
+            ActionLocation::Global
+        } else if path.parent().unwrap() == std::env::current_dir().unwrap().as_path() {
+            ActionLocation::CurrentDirectory
+        } else {
+            ActionLocation::AncestorDirectory
+        }
     }
 }
 

@@ -1,7 +1,7 @@
-use termion::color;
+use termion::color::{self, Color};
 use termkit::ui::*;
 
-use crate::model::Action;
+use crate::model::{Action, ActionLocation};
 
 pub struct Formatter<'a> {
     actions: &'a Vec<Action>,
@@ -23,7 +23,7 @@ impl<'a> Formatter<'a> {
 impl<'a> Formatter<'a> {
     fn icon(&self, action: &Action) -> String {
         let icon = action.icon.clone().unwrap_or("·".to_string());
-        lspan(&icon, color::Yellow, 3)
+        lspan(&icon, icon_color(&action), 3)
     }
 
     fn title(&self, action: &Action) -> String {
@@ -42,5 +42,13 @@ impl<'a> Formatter<'a> {
             icon = icon,
             title = title
         )
+    }
+}
+
+fn icon_color(action: &Action) -> &'static dyn Color {
+    match &action.location() {
+        ActionLocation::Global => &color::Green,
+        ActionLocation::CurrentDirectory => &color::Yellow,
+        ActionLocation::AncestorDirectory => &color::Blue,
     }
 }
