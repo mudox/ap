@@ -22,8 +22,8 @@ pub fn handle(path: &str) {
 }
 
 fn run(path: &str) {
-    let tip = format!("  executing `{}` ...", path);
-    let tip = fg(color::Blue, &tip);
+    let tip = format!("  Execute `{}`", path);
+    let tip = fg(color::Green, &tip);
     println!("{}", tip);
 
     let child = Command::new(path).spawn();
