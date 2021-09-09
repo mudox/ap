@@ -1,10 +1,8 @@
 use std::path::Path;
 use std::process::Command;
 
-use termion::color;
-use termkit::ui::fg;
-
 use crate::logging::*;
+use console::{self, style};
 
 pub fn handle(path: &str) {
     let mut lines = path.split("\n");
@@ -23,8 +21,7 @@ pub fn handle(path: &str) {
 
 fn run(path: &str) {
     let tip = format!("  Execute `{}`", path);
-    let tip = fg(color::Green, &tip);
-    println!("{}", tip);
+    println!("{}", style(tip).green());
 
     let child = Command::new(path).spawn();
     if let Err(ref error) = child {

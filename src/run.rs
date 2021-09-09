@@ -1,3 +1,5 @@
+use console::Term;
+
 use std::fs::{self, OpenOptions};
 use std::io::{ErrorKind, Write};
 use std::os::unix::fs::OpenOptionsExt;
@@ -61,7 +63,7 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
         .arg("ap preview {1}")
         .arg("--preview-window");
 
-    if let Ok((w, _)) = termion::terminal_size() {
+    if let Some((w, _)) = Term::stdout().size_checked() {
         // 💀 magic number */
         if w < 170 {
             cmd_mut_ref.arg("down,70%,nowrap");

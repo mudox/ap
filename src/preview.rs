@@ -3,8 +3,7 @@ use std::fs;
 use std::process::Command;
 use std::str;
 
-use termion::color;
-use termkit::ui::*;
+use console::{self, pad_str, style, Alignment, Color};
 use time::{format_description, OffsetDateTime};
 
 use crate::logging::*;
@@ -45,8 +44,9 @@ pub fn preview(path: &str) {
 const W0: usize = 16;
 
 fn line(title: &str, content: &str) -> String {
-    let title = span(title, color::Blue, W0, Alignment::Left);
-    let content = fg(color::Yellow, content);
+    let title = style(title).blue().to_string();
+    let title = pad_str(&title, W0, Alignment::Left, None);
+    let content = style(content).yellow().to_string();
     format!("{}{}", title, content)
 }
 
