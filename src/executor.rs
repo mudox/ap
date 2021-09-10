@@ -13,7 +13,6 @@ pub fn handle(path: &str) {
 
     match key {
         "ctrl-e" => edit(path),
-        "ctrl-i" => edit(Path::new(path).with_extension("toml")),
         "" => run(path),
         _ => error!("unhandled result key: {:?}", key),
     }

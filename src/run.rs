@@ -83,7 +83,7 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
         .arg("--bind")
         .arg("ctrl-alt-b:preview-page-up");
 
-    cmd_mut_ref = cmd_mut_ref.arg("--expect=ctrl-e,ctrl-i");
+    cmd_mut_ref = cmd_mut_ref.arg("--expect=ctrl-e");
 
     let mut child = cmd_mut_ref
         // pipe
