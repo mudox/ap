@@ -6,10 +6,16 @@ use console::{self, style};
 
 pub fn handle(path: &str) {
     let mut lines = path.split("\n");
+
     let key = lines.next().unwrap().trim();
+
     let path = lines.next().unwrap();
+    if !Path::new(path).exists() {
+        return;
+    }
 
     debug!("pressed key: {:#?}", key);
+    debug!("select path: {:#?}", path);
 
     match key {
         "ctrl-e" => edit(path),
