@@ -11,6 +11,7 @@ pub fn handle(path: &str) {
 
     let path = lines.next().unwrap();
     if !Path::new(path).exists() {
+        println!("Quit with empty selection!");
         return;
     }
 
