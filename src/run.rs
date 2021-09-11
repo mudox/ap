@@ -63,7 +63,7 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
         .arg("ap preview {1}")
         .arg("--preview-window");
 
-    if let Some((w, _)) = Term::stdout().size_checked() {
+    if let Some((_, w)) = Term::stdout().size_checked() {
         // 💀 magic number */
         if w < 170 {
             cmd_mut_ref.arg("down,70%,nowrap");
