@@ -9,7 +9,7 @@ description = "Action palette"
 
 [dependencies]
 # cli
-clap = "3.0.0-beta.2"
+clap = "3.0.0-beta.4"
 
 # file system
 dirs = "3.0.2"
