@@ -20,8 +20,10 @@ pub fn run(config: Config) {
         Task::Execute => {
             let actions = discover::actions();
             match choose_action(&actions) {
-                Some(lines) => executor::handle(&lines),
-                _ => info!("nothing selected"),
+                Some(lines) => executor::handle(&lines, &actions),
+                _ => {
+                    info!("nothing selected")
+                }
             }
         }
         Task::New { name, global } => create_action(&name, global),
@@ -38,7 +40,7 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
 
     // search
     cmd_mut_ref = cmd_mut_ref
-        .arg("--with-nth=2..")
+        .arg("--with-nth=3..")
         .arg("--no-sort")
         .arg("--tiebreak=end");
 
@@ -60,7 +62,7 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
     // preview
     cmd_mut_ref = cmd_mut_ref
         .arg("--preview")
-        .arg("ap preview {1}")
+        .arg("ap preview {2}")
         .arg("--preview-window");
 
     if let Some((_, w)) = Term::stdout().size_checked() {

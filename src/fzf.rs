@@ -14,7 +14,8 @@ impl<'a> Formatter<'a> {
     pub fn feed(&self) -> Vec<String> {
         self.actions
             .iter()
-            .map(|a| self.line(a).to_string())
+            .enumerate()
+            .map(|(i, a)| self.line(i, a))
             .collect()
     }
 }
@@ -31,14 +32,15 @@ impl<'a> Formatter<'a> {
         pad_str(title, 100, Alignment::Left, None).to_string()
     }
 
-    fn line(&self, action: &Action) -> String {
+    fn line(&self, index: usize, action: &Action) -> String {
         let icon = self.icon(action);
         let title = self.title(action);
+        // let path = action.path.to_str().unwrap();
 
-        let path = action.path.to_str().unwrap();
         format!(
-            "{path}\t{icon} {title}",
-            path = path,
+            "{index}\t{path}\t{icon} {title}",
+            index = index,
+            path = action.path.to_str().unwrap_or(""),
             icon = icon,
             title = title
         )

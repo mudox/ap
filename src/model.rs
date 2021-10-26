@@ -25,6 +25,8 @@ pub struct Action {
     pub title: String,
 
     pub description: Option<String>,
+
+    pub cd: Option<bool>,
 }
 
 impl Action {
@@ -98,6 +100,7 @@ mod tests {
             icon: Some("\u{f592} ".to_string()),
             title: "Title of can-run".to_string(),
             description: Some("Description of can-run\n".to_string()),
+            ..Default::default()
         };
 
         assert_eq!(left, right);

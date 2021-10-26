@@ -1,46 +1,70 @@
 use std::path::Path;
 use std::process::Command;
 
-use crate::logging::*;
 use console::{self, style};
 
-pub fn handle(path: &str) {
-    let mut lines = path.split("\n");
+use crate::logging::*;
+use crate::model::Action;
+
+pub fn handle(lines: &str, actions: &[Action]) {
+    let mut lines = lines.split("\n");
 
     let key = lines.next().unwrap().trim();
+    let line2 = lines.next().unwrap();
+    let mut pair = line2.split("\t");
+    let index = pair.next().unwrap().parse::<usize>();
+    if let Err(e) = index {
+        warn!("failed to parse index from line #2: {:#?}", e);
+        return;
+    }
 
-    let path = lines.next().unwrap();
-    if !Path::new(path).exists() {
-        println!("Quit with empty selection!");
+    let action = &actions[index.unwrap()];
+
+    if !action.path.exists() {
+        println!("invalid action path: {:?}, quit", action.path);
         return;
     }
 
     debug!("pressed key: {:#?}", key);
-    debug!("select path: {:#?}", path);
+    debug!("select path: {:#?}", action);
 
     match key {
-        "ctrl-e" => edit(path),
-        "" => run(path),
+        "ctrl-e" => edit_action(&action),
+        "" => run(&action),
         _ => error!("unhandled result key: {:?}", key),
     }
 }
 
-fn run(path: &str) {
-    let tip = format!("  Execute `{}`", path);
+fn run(action: &Action) {
+    let tip = format!("  Execute `{:?}`", &action.path);
     println!("{}", style(tip).green());
 
-    let child = Command::new(path).spawn();
+    if action.cd.unwrap_or(false) {
+        let parent_dir = action.path.parent().unwrap().parent().unwrap();
+        std::env::set_current_dir(parent_dir).unwrap();
+        let s = format!("at {:?}", parent_dir);
+        let s = style(s).green();
+        println!("{}", s);
+    }
+
+    let mut cmd = Command::new(&action.path);
+
+    let child = cmd.spawn();
     if let Err(ref error) = child {
         error!(
             "failed to execute action:\n  path: {:?}\n  error: {:?}",
-            path, error
+            action.path, error
         );
     };
 
     child.unwrap().wait().unwrap();
 }
 
-pub fn edit<P: AsRef<Path>>(path: P) {
+pub fn edit_action(action: &Action) {
+    edit(&action.path);
+}
+
+pub fn edit<P: AsRef<Path>>(path: &P) {
     let meta_path = path.as_ref().with_extension("toml");
 
     Command::new("nvim")
