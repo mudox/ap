@@ -26,6 +26,10 @@ pub struct Action {
 
     pub description: Option<String>,
 
+    /// cd to action script's grand parent dir before executing it
+    ///
+    /// e.g. for action script in /a/b/c/.ap-actions/1.zsh, cd to /a/b/c then
+    /// execute the script
     pub cd: Option<bool>,
 }
 
