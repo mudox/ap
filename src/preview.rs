@@ -3,7 +3,7 @@ use std::fs;
 use std::process::Command;
 use std::str;
 
-use console::{self, pad_str, style, Alignment, Color};
+use console::{self, pad_str, style, Alignment};
 use time::{format_description, OffsetDateTime};
 
 use crate::logging::*;
