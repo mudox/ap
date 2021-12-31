@@ -8,7 +8,7 @@ pub fn dir() -> PathBuf {
     path.push(".config/ap");
 
     match std::env::var("XDG_CONFIG_HOME") {
-        Ok(path) => Path::new(&path).join("ap").to_path_buf(),
+        Ok(path) => Path::new(&path).join("ap"),
         _ => path,
     }
 }
@@ -37,11 +37,11 @@ impl Config {
                 Arg::new("global")
                     .short('g')
                     .long("global")
-                    .about("Create a global action"),
+                    .help("Create a global action"),
             )
             .arg(
                 Arg::new("ACTION_NAME")
-                    .about("The filename of the action")
+                    .help("The filename of the action")
                     .required(true)
                     .index(1),
             );
@@ -51,7 +51,7 @@ impl Config {
             .about("Generate fzf preview content for ACTION_PATH")
             .arg(
                 Arg::new("ACTION_PATH")
-                    .about("The path of the action file to generate preview")
+                    .help("The path of the action file to generate preview")
                     .required(true)
                     .index(1),
             )
