@@ -36,17 +36,15 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
     let feed = fzf.feed().join("\n");
 
     let mut cmd = Command::new("fzf");
-    let mut cmd_mut_ref = cmd.env("FZF_DEFAULT_OPTS", "");
+    cmd.env("FZF_DEFAULT_OPTS", "");
 
     // search
-    cmd_mut_ref = cmd_mut_ref
-        .arg("--with-nth=3..")
+    cmd.arg("--with-nth=3..")
         .arg("--no-sort")
         .arg("--tiebreak=end");
 
     // appearance
-    cmd_mut_ref = cmd_mut_ref
-        .arg("--layout=reverse")
+    cmd.arg("--layout=reverse")
         .arg("--height=60%")
         .arg("--min-height=30")
         .arg("--ansi")
@@ -60,23 +58,21 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
         .arg("--color=bg:-1,bg+:-1"); // transparent background
 
     // preview
-    cmd_mut_ref = cmd_mut_ref
-        .arg("--preview")
+    cmd.arg("--preview")
         .arg("ap preview {2}")
         .arg("--preview-window");
 
     if let Some((_, w)) = Term::stdout().size_checked() {
         // 💀 magic number */
         if w < 170 {
-            cmd_mut_ref.arg("down,70%,nowrap");
+            cmd.arg("down,70%,nowrap");
         } else {
-            cmd_mut_ref.arg("right,60%,nowrap");
+            cmd.arg("right,60%,nowrap");
         }
     }
 
     // key bindings
-    cmd_mut_ref = cmd_mut_ref
-        .arg("--bind")
+    cmd.arg("--bind")
         .arg("ctrl-f:page-down")
         .arg("--bind")
         .arg("ctrl-b:page-up")
@@ -85,9 +81,9 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
         .arg("--bind")
         .arg("ctrl-alt-b:preview-page-up");
 
-    cmd_mut_ref = cmd_mut_ref.arg("--expect=ctrl-e");
+    cmd.arg("--expect=ctrl-e");
 
-    let mut child = cmd_mut_ref
+    let mut child = cmd
         // pipe
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
