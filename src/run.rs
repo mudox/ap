@@ -45,9 +45,7 @@ fn choose_action(actions: &[Action]) -> Option<String> {
     cmd.env("FZF_DEFAULT_OPTS", "");
 
     // search
-    cmd.arg("--with-nth=3..")
-        .arg("--no-sort")
-        .arg("--tiebreak=end");
+    cmd.arg("--with-nth=3..").arg("--no-sort");
 
     // appearance
     cmd.arg("--layout=reverse")
