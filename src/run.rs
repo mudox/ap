@@ -17,8 +17,11 @@ use crate::preview::preview;
 
 pub fn run(config: Config) {
     match config.task {
-        Task::Execute => {
-            let actions = discover::actions();
+        Task::Execute { only_tmux_action } => {
+            let mut actions = discover::actions();
+            if only_tmux_action {
+                actions = actions.into_iter().filter(|x| x.tmux.is_some()).collect();
+            }
             match choose_action(&actions) {
                 Some(lines) => executor::handle(&lines, &actions),
                 _ => {
@@ -26,12 +29,15 @@ pub fn run(config: Config) {
                 }
             }
         }
-        Task::New { name, global } => create_action(&name, global),
+        Task::New {
+            name,
+            is_global: global,
+        } => create_action(&name, global),
         Task::Preview(path) => preview(&path),
     }
 }
 
-fn choose_action(actions: &Vec<Action>) -> Option<String> {
+fn choose_action(actions: &[Action]) -> Option<String> {
     let fzf = Formatter::new(actions);
     let feed = fzf.feed().join("\n");
 
@@ -106,7 +112,7 @@ fn choose_action(actions: &Vec<Action>) -> Option<String> {
     // would get 2 lines if fzf not cancelled by user:
     //   1 - the key pressed to end fzf, empty for `enter`
     //   2 - the path of the chosen action
-    let lines = output.split("\t").take(1).collect::<String>();
+    let lines = output.split('\t').take(1).collect::<String>();
     debug!("chosen: {:?}", lines);
 
     if lines.is_empty() {

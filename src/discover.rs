@@ -4,7 +4,7 @@ use std::path::Path;
 
 use crate::logging::*;
 
-use crate::config::{self};
+use crate::config;
 use crate::model::Action;
 
 /// Lookup actions from `.ap-actions` directory under the argument `path`.
@@ -70,8 +70,6 @@ mod tests {
     #[allow(unused_imports)]
     use pretty_assertions::{assert_eq, assert_ne};
 
-    use std::path::PathBuf;
-
     #[test]
     fn test_local_actions() {
         let path = Path::new("/Users/mudox/Develop/Rust/ap/tests/dir/d0/d1/d2/d3");
@@ -79,23 +77,26 @@ mod tests {
         println!("actions: {:#?}", &actions);
 
         let ac1 = Action {
-            path: PathBuf::from(
-                path.parent()
-                    .unwrap()
-                    .parent()
-                    .unwrap()
-                    .join(".ap-actions/ac1"),
-            ),
+            path: path
+                .parent()
+                .unwrap()
+                .parent()
+                .unwrap()
+                .join(".ap-actions/ac1"),
             icon: Some("ac1".to_string()),
             title: "Title of ac1".to_string(),
             description: Some("Description of ac1\n".to_string()),
+            tmux: None,
+            cd: None,
         };
 
         let ac3 = Action {
-            path: PathBuf::from(path.join(".ap-actions/ac3")),
+            path: path.join(".ap-actions/ac3"),
             icon: Some("ac3".to_string()),
             title: "Title of ac3".to_string(),
             description: Some("Description of ac3\n".to_string()),
+            tmux: None,
+            cd: None,
         };
 
         assert_eq!(actions[0], ac3);

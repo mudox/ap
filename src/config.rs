@@ -19,8 +19,8 @@ pub fn global_actions_dir() -> PathBuf {
 }
 
 pub enum Task {
-    New { name: String, global: bool },
-    Execute,
+    New { name: String, is_global: bool },
+    Execute { only_tmux_action: bool },
     Preview(String),
 }
 
@@ -60,6 +60,7 @@ impl Config {
         let matches = app_from_crate!()
             .subcommand(new)
             .subcommand(preview)
+            .arg(Arg::new("tmux").short('t').help("Only show tmux actions"))
             .get_matches();
 
         let task = if let Some(matches) = matches.subcommand_matches("preview") {
@@ -68,9 +69,15 @@ impl Config {
         } else if let Some(matches) = matches.subcommand_matches("new") {
             let name = matches.value_of("ACTION_NAME").unwrap().to_string();
             let global = matches.is_present("global");
-            Task::New { name, global }
+            Task::New {
+                name,
+                is_global: global,
+            }
         } else {
-            Task::Execute
+            let flag = matches.is_present("tmux");
+            Task::Execute {
+                only_tmux_action: flag,
+            }
         };
 
         Config { task }

@@ -15,6 +15,11 @@ pub enum ActionLocation {
 }
 
 #[derive(Default, Debug, Deserialize, PartialEq)]
+pub struct Tmux {
+    pub pane_title: String,
+}
+
+#[derive(Default, Debug, Deserialize, PartialEq)]
 pub struct Action {
     #[serde(skip)]
     pub path: PathBuf,
@@ -24,12 +29,16 @@ pub struct Action {
 
     pub title: String,
 
+    #[serde(default)]
+    pub tmux: Option<Tmux>,
+
     pub description: Option<String>,
 
     /// cd to action script's grand parent dir before executing it
     ///
     /// e.g. for action script in /a/b/c/.ap-actions/1.zsh, cd to /a/b/c then
     /// execute the script
+    #[serde(default)]
     pub cd: Option<bool>,
 }
 

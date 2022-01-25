@@ -3,11 +3,11 @@ use console::{self, pad_str, style, Alignment, Color};
 use crate::model::{Action, ActionLocation::*};
 
 pub struct Formatter<'a> {
-    actions: &'a Vec<Action>,
+    actions: &'a [Action],
 }
 
 impl<'a> Formatter<'a> {
-    pub fn new(actions: &Vec<Action>) -> Formatter {
+    pub fn new(actions: &[Action]) -> Formatter {
         Formatter { actions }
     }
 
@@ -22,8 +22,8 @@ impl<'a> Formatter<'a> {
 
 impl<'a> Formatter<'a> {
     fn icon(&self, action: &Action) -> String {
-        let icon = action.icon.clone().unwrap_or("·".to_string());
-        let icon = style(icon).fg(icon_color(&action)).to_string();
+        let icon = action.icon.clone().unwrap_or_else(|| "·".to_string());
+        let icon = style(icon).fg(icon_color(action)).to_string();
         pad_str(&icon, 3, Alignment::Left, Some("")).to_string()
     }
 
