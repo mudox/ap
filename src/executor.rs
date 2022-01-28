@@ -74,7 +74,14 @@ fn respawn_tmux_pane(action: &Action, title: &str) {
     let pane_id = std::env::var("TMUX_PANE").unwrap();
 
     // set pane title
-    tmux_run(&["select-pane", "-t", &pane_id, "-T", title]);
+    tmux_run(&[
+        "set-option",
+        "-p",
+        "-t",
+        &pane_id,
+        "pane-border-format",
+        &format!(" [#{{pane_index}}] {}", title),
+    ]);
 
     // respawn pane
     // NOTE: `respawn-pane` below would kill current process, hence code after it is not reachable
