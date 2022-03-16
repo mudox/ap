@@ -34,15 +34,17 @@ impl<'a> Formatter<'a> {
 
     fn line(&self, index: usize, action: &Action) -> String {
         let icon = self.icon(action);
-        let title = self.title(action);
-        // let path = action.path.to_str().unwrap();
+        let title = &action.title;
+        let path = action.path.to_str().unwrap();
+        let symlink = if action.path.is_symlink() { " " } else { "" };
 
         format!(
-            "{index}\t{path}\t{icon} {title}",
+            "{index}\t{path}\t{icon} {title} {symlink}",
             index = index,
-            path = action.path.to_str().unwrap_or(""),
+            path = path,
             icon = icon,
-            title = title
+            title = title,
+            symlink = symlink
         )
     }
 }
