@@ -80,7 +80,7 @@ fn respawn_tmux_pane(action: &Action, title: &str) {
         "-t",
         &pane_id,
         "pane-border-format",
-        &format!(" [#{{pane_index}}] {}", title),
+        &format!(" [#{{pane_index}}] {} ", title),
     ]);
 
     // respawn pane
